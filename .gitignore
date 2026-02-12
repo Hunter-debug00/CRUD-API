@@ -1,0 +1,7 @@
+__pycache__/
+alembic/__pycache__/
+venv/
+.env
+.env/
+.env.*
+.vscode/
