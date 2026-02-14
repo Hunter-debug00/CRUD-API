@@ -1,8 +1,8 @@
 from fastapi import status, APIRouter, Depends, HTTPException
-from .. import schemas, db, models, utils, oauth2
+from .. import schemas, db, models, oauth2
 from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="/vote", tags=["VOTE"])
+router = APIRouter(prefix="/vote", tags=["Votes"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)

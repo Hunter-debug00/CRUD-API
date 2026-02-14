@@ -1,8 +1,7 @@
-from fastapi import Depends, HTTPException, status, APIRouter
-from app.db import get_db
+from fastapi import Depends, HTTPException, APIRouter
+from ..db import get_db
 from uuid import UUID
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from .. import models, schemas, utils
 
 router = APIRouter(prefix="/users", tags=["Users"])

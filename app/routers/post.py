@@ -1,11 +1,11 @@
 from fastapi import Depends, HTTPException, status, APIRouter
-from app.db import get_db
+from ..db import get_db
 from typing import Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select
 from typing import List
-from .. import models, schemas, oauth2
+from .. import models, schemas, utils, oauth2
 
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
@@ -20,26 +20,18 @@ def get_posts(
     search: Optional[str] = "",
 ):
 
-    results = (
-        db.query(
-            models.Post,
-            func.count(models.Vote.post_id).label("votes"),
-        )
-        .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
-        .filter(models.Post.title.contains(search))
-        .group_by(models.Post)
+    query = (
+        select(models.Post, func.count(models.Vote.post_id).label("votes"))
+        .outerjoin(models.Vote, models.Vote.post_id == models.Post.id)
+        .where(models.Post.title.ilike(f"%{search}%"))
+        .group_by(models.Post.id)
         .limit(limit)
         .offset(skip)
-        .all()
     )
 
-    posts = []
+    results = db.execute(query).all()
 
-    for post, votes in results:
-        post.votes = votes
-        posts.append(post)
-
-    return posts
+    return [utils.post_with_votes(post, votes) for post, votes in results]
 
 
 @router.post(
@@ -63,24 +55,20 @@ def get_post(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(oauth2.get_current_user),
 ):
-    result = (
-        db.query(
-            models.Post,
-            func.count(models.Vote.post_id).label("votes"),
-        )
-        .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
-        .filter(models.Post.id == id)
-        .group_by(models.Post)
-        .first()
+    query = (
+        select(models.Post, func.count(models.Vote.post_id).label("votes"))
+        .outerjoin(models.Vote, models.Vote.post_id == models.Post.id)
+        .where(models.Post.id == id)
+        .group_by(models.Post.id)
     )
+
+    result = db.execute(query).first()
 
     if not result:
         raise HTTPException(status_code=404, detail="Post not found")
 
     post, votes = result
-    post.votes = votes
-
-    return post
+    return utils.post_with_votes(post, votes)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

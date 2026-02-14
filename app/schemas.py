@@ -30,7 +30,7 @@ class PostResponse(PostCreate):
     model_config = ConfigDict(from_attributes=True)
 
 class PostWithVotes(PostResponse):
-    votes: int
+    votes: int = 0
     model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
@@ -50,7 +50,6 @@ class TokenModel(BaseModel):
 
 class TokenData(BaseModel):
     user_id: Optional[UUID] = None
-    username: Optional[str] = None
 
 
 class VoteModel(BaseModel):
