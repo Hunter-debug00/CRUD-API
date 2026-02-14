@@ -11,7 +11,9 @@ from .. import models, schemas, utils, oauth2
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-@router.get("/", response_model=List[schemas.PostWithVotes])
+@router.get(
+    "/", response_model=List[schemas.PostWithVotes], response_model_exclude_none=True
+)
 def get_posts(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(oauth2.get_current_user),
@@ -35,7 +37,10 @@ def get_posts(
 
 
 @router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.PostResponse,
+    response_model_exclude_none=True,
 )
 def create_post(
     post: schemas.PostCreate,
@@ -49,7 +54,9 @@ def create_post(
     return new_post
 
 
-@router.get("/{id}", response_model=schemas.PostWithVotes)
+@router.get(
+    "/{id}", response_model=schemas.PostWithVotes, response_model_exclude_none=True
+)
 def get_post(
     id: UUID,
     db: Session = Depends(get_db),
@@ -89,7 +96,9 @@ def delete_post(
     db.commit()
 
 
-@router.patch("/{id}", response_model=schemas.PostResponse)
+@router.patch(
+    "/{id}", response_model=schemas.PostResponse, response_model_exclude_none=True
+)
 def update_post(
     id: UUID,
     data: schemas.PostUpdate,

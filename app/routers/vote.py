@@ -21,7 +21,7 @@ def vote(
     )
     found_vote = vote_query.first()
 
-    if vote.dir == 1:
+    if vote.dir == schemas.VoteDirection.UP:
         if found_vote:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -31,7 +31,7 @@ def vote(
         db.add(new_vote)
         db.commit()
         return {"message": "successfully voted on the post"}
-    elif vote.dir == 0:
+    elif vote.dir == schemas.VoteDirection.DOWN:
         if not found_vote:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Vote does not exist"
@@ -41,4 +41,6 @@ def vote(
 
         return {"message": "successfully deleted vote"}
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong dir value")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong dir value"
+        )

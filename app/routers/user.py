@@ -20,7 +20,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get("/{id}", response_model=schemas.UserOut)
+@router.get("/{id}", response_model=schemas.UserOut, response_model_exclude_none=True)
 def get_user(id: UUID, db: Session = Depends(get_db)):
     user = db.get(models.User, id)
     if not user:

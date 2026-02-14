@@ -1,7 +1,12 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-from typing import Optional, Literal
+from typing import Optional
 from datetime import datetime
 from uuid import UUID
+from enum import IntEnum
+
+class VoteDirection(IntEnum):
+    UP = 1
+    DOWN = 0
 
 
 class PostCreate(BaseModel):
@@ -54,4 +59,4 @@ class TokenData(BaseModel):
 
 class VoteModel(BaseModel):
     post_id: UUID
-    dir: Literal[0, 1]
+    dir: VoteDirection 
